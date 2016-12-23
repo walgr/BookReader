@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">小说阅读器</string>
+    <string name="str_bookshelve">书架</string>
+    <string name="str_bookshop">书城</string>
+    <string name="str_user">用户</string>
+    <string name="hello_blank_fragment">书籍信息</string>
+</resources>

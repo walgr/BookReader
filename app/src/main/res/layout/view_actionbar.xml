@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/height_actionbar"
+    android:background="@color/color_actionBar_Back"
+    android:gravity="center_vertical"
+    android:id="@+id/my_actionbar"
+    android:alpha="0.9"
+    android:elevation="3dp">
+
+    <ImageButton
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:src="@drawable/ic_arrow_back_blue_500_24dp"
+        android:id="@+id/action_back"
+        android:background="@null" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginLeft="12dp"
+        android:gravity="right|center_vertical"
+        android:layout_marginRight="16dp">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:id="@+id/aciton_more"
+            android:src="@drawable/ic_more_horiz_blue_500_24dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

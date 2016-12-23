@@ -1,0 +1,39 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="XiaoShuoReaderTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="PopWindowStyle" parent="AppTheme">
+        <item name="android:textColor">@color/textColor</item>
+    </style>
+
+    <style name="BookInfoStyle" parent="Theme.AppCompat.NoActionBar">
+        <item name="@android:windowAnimationStyle">@style/myact</item>
+        <!--<item name="windowBackground">@color/transparent</item>-->
+        <!--<item name="colorBackgroundCacheHint">@null</item>-->
+        <!--<item name="windowIsTranslucent">true</item>-->
+        <!--&lt;!&ndash; Note that we use the base animation style here (that is no-->
+             <!--animations) because we really have no idea how this kind of-->
+             <!--activity will be used. &ndash;&gt;-->
+        <!--<item name="windowAnimationStyle">@style/Animation</item>-->
+    </style>
+
+    <style name="myact">
+        <!--<item name="@android:windowEnterAnimation">@anim/actionset_up</item>-->
+        <!--<item name="@android:windowExitAnimation">@anim/actionset_down</item>-->
+        <item name="android:activityOpenEnterAnimation">@anim/actionset_up</item>
+        <item name="android:activityOpenExitAnimation">@anim/actionset_down</item>
+        <item name="android:activityCloseEnterAnimation">@anim/actionset_up</item>
+        <item name="android:activityCloseExitAnimation">@anim/actionset_down</item>
+    </style>
+
+</resources>

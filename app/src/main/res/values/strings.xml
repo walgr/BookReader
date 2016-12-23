@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">BookReader</string>
+
+    <string name="str_bookshelve">BookShelve</string>
+    <string name="str_user">User</string>
+    <string name="str_bookshop">BookShop</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
