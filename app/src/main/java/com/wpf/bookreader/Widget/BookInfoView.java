@@ -14,7 +14,7 @@ import com.wpf.bookreader.Adapter.BookChapterListAdapter;
 import com.wpf.bookreader.Adapter.OnItemClickListener;
 import com.wpf.bookreader.DataBase.ChapterInfo;
 import com.wpf.bookreader.R;
-import com.wpf.bookreader.DataInfo.BookInfo;
+import com.wpf.bookreader.DataBase.BookInfo;
 import com.wpf.bookreader.ReadActivity;
 import com.wpf.bookreader.Utils.GetStringByUrl;
 

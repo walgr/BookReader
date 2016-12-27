@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.wpf.bookreader.DataInfo.BookInfo;
+import com.wpf.bookreader.DataBase.BookInfo;
 import com.wpf.bookreader.R;
 
 import java.util.ArrayList;
@@ -25,9 +25,6 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
     private OnItemClickListener onItemClickListener;
     private Context context;
     private List<BookInfo> bookInfoList = new ArrayList<>();
-
-    public BookListAdapter() {
-    }
 
     public BookListAdapter(List<BookInfo> bookInfoList) {
         this.bookInfoList = bookInfoList;
@@ -55,6 +52,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
 
     public BookListAdapter setBookInfoList(List<BookInfo> bookInfoList) {
         this.bookInfoList = bookInfoList;
+        notifyDataSetChanged();
         return this;
     }
 

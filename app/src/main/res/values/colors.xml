@@ -5,8 +5,8 @@
     <color name="colorAccent">#009688</color>
 
     <color name="color_actionBar_Back">#212121</color>
-
+    <color name="white">#FFFFFF</color>
     <color name="textColor">#5677fc</color>
-
+    <color name="transparent">@android:color/transparent</color>
     <color name="colorBack">#000000</color>
 </resources>

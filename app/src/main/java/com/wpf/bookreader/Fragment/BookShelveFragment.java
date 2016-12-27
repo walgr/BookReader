@@ -14,10 +14,11 @@ import android.view.ViewGroup;
 import com.wpf.bookreader.Adapter.BookListAdapter;
 import com.wpf.bookreader.Adapter.OnItemClickListener;
 import com.wpf.bookreader.BookInfoActivity;
-import com.wpf.bookreader.DataInfo.BookInfo;
+import com.wpf.bookreader.DataBase.BookInfo;
+import com.wpf.bookreader.DataBase.BookManager;
 import com.wpf.bookreader.R;
-import com.wpf.bookreader.Utils.GetBookList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookShelveFragment extends BaseFragment implements
@@ -25,7 +26,7 @@ public class BookShelveFragment extends BaseFragment implements
 
     private RecyclerView bookList;
     private BookListAdapter bookListAdapter;
-    private List<BookInfo> bookInfoList = GetBookList.getUserBook();
+    private List<BookInfo> bookInfoList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,9 +48,22 @@ public class BookShelveFragment extends BaseFragment implements
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        bookInfoList = BookManager.getBookList();
+        bookListAdapter.setBookInfoList(bookInfoList);
+    }
+
+    @Override
     public void onClick(int position) {
         Intent intent = new Intent(getActivity(), BookInfoActivity.class);
         intent.putExtra("BookInfo",bookInfoList.get(position));
         startActivity(intent);
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        //getActivity().overridePendingTransition(R.anim.actionset_up,R.anim.zoom_enter);
     }
 }

@@ -56,10 +56,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void setToolBar(String title) {
-        getSupportActionBar().setTitle(title);
-    }
-
     private void getFragments() {
         fragmentList.add(new BookShelveFragment());
         fragmentList.add(new BookShopFragment());
@@ -68,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSelected(int index, Object tag) {
-        setToolBar(fragmentList.get(index).getTitle());
         viewPager_Home.setCurrentItem(index,false);
     }
 

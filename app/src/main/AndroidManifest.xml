@@ -18,11 +18,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BookInfoActivity" />
+        <activity android:name=".BookInfoActivity"
+            android:label="@string/str_bookinfo"/>
         <activity android:name=".ReadActivity"
             android:launchMode="standard"
             android:singleUser="true"
-            android:theme="@style/XiaoShuoReaderTheme">
+            android:theme="@style/FullscreenTheme">
 
         </activity>
 

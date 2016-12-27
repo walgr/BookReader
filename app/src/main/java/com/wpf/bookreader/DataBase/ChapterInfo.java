@@ -22,6 +22,10 @@ public class ChapterInfo implements Parcelable {
     @Id
     //章节url地址
     private String url = "";
+
+    //书籍地址
+    private String bookUrl = "";
+
     //章节名称
     private String chapterName = "";
     //章节内容
@@ -30,10 +34,12 @@ public class ChapterInfo implements Parcelable {
     //章节分页内容
     private List<String> chapterPageList = new ArrayList<>();
 
-    @Generated(hash = 644541341)
-    public ChapterInfo(int position, String url, String chapterName, String chapterPageContent) {
+    @Generated(hash = 1686365921)
+    public ChapterInfo(int position, String url, String bookUrl, String chapterName,
+            String chapterPageContent) {
         this.position = position;
         this.url = url;
+        this.bookUrl = bookUrl;
         this.chapterName = chapterName;
         this.chapterPageContent = chapterPageContent;
     }
@@ -117,6 +123,14 @@ public class ChapterInfo implements Parcelable {
         dest.writeString(this.chapterName);
         dest.writeString(this.chapterPageContent);
         dest.writeStringList(this.chapterPageList);
+    }
+
+    public String getBookUrl() {
+        return this.bookUrl;
+    }
+
+    public void setBookUrl(String bookUrl) {
+        this.bookUrl = bookUrl;
     }
 
     protected ChapterInfo(Parcel in) {

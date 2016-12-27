@@ -29,7 +29,7 @@ public class GetStringByUrl {
     public void getChapterListByUrl(String url, OnListFinish onListFinish) {
         this.onListFinish = onListFinish;
         new MyGetListAsyncTask().execute(url);
-        KLog.a("正在获取小说目录");
+        KLog.a("正在获取小说网址:"+url+"目录");
     }
 
     public void getChapterContentByUrl(String url, String name, OnTextFinish onTextFinish) {
@@ -48,11 +48,14 @@ public class GetStringByUrl {
                 Collections.reverse(titles);
                 int i = 0;
                 for(String string : titles) {
-                    chapterList.add(getChapter(string).setPosition(i++));
+                    ChapterInfo chapterInfo = getChapter(string).setPosition(i++);
+                    chapterInfo.setBookUrl(strings[0]);
+                    chapterList.add(chapterInfo);
                 }
                 ChapterManager.saveChapterInfoList(chapterList);
             } catch (IOException e) {
                 e.printStackTrace();
+                chapterList = ChapterManager.getChapterInfoList(strings[0]);
             }
             return chapterList;
         }
@@ -107,13 +110,13 @@ public class GetStringByUrl {
         return string;
     }
 
-    private String getInfoByUrl(String url) throws IOException {
+    public static String getInfoByUrl(String url) throws IOException {
         Request request = new Request.Builder().url(url).build();
         Response response = BookReaderApplication.okHttpClient.newCall(request).execute();
         return new String(response.body().bytes(),"GBK");
     }
 
-    private List<String> getSubString(String str,String start,String end) {
+    public static List<String> getSubString(String str,String start,String end) {
         List<String> strings = new ArrayList<>();
         if(!(str.contains(start) && str.contains(end))) return strings;
         List<Integer> indexList = new ArrayList<>();
@@ -137,7 +140,7 @@ public class GetStringByUrl {
         return strings;
     }
 
-    private List<String> getTitleString(String str, String start, String end) {
+    public static List<String> getTitleString(String str, String start, String end) {
         List<String> strings = new ArrayList<>();
         List<Integer> indexList = new ArrayList<>();
         int index_start;

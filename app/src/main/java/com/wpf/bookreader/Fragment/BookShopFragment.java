@@ -9,10 +9,13 @@ import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import com.wpf.bookreader.DataBase.BookInfo;
+import com.wpf.bookreader.DataBase.BookManager;
 import com.wpf.bookreader.DataBase.ChapterInfo;
-import com.wpf.bookreader.DataInfo.BookInfo;
 import com.wpf.bookreader.R;
+import com.wpf.bookreader.Utils.GetBookInfoByUrl;
 import com.wpf.bookreader.Utils.GetStringByUrl;
 
 import java.util.List;
@@ -51,13 +54,30 @@ public class BookShopFragment extends BaseFragment implements
 
     @Override
     public void onClick(View view) {
-        new GetStringByUrl().getChapterListByUrl(bookShop.getUrl(), new GetStringByUrl.OnListFinish() {
+        new GetStringByUrl().getChapterListByUrl(getListUrl(bookShop.getUrl()), new GetStringByUrl.OnListFinish() {
             @Override
             public void onSuccess(List<ChapterInfo> result) {
                 if(!result.isEmpty()) {
-                    new BookInfo()
+                    new GetBookInfoByUrl().get(bookShop.getUrl(), new GetBookInfoByUrl.OnBookScanFinish() {
+                        @Override
+                        public void onSuccess(BookInfo bookInfo) {
+                            Toast.makeText(getContext(),"添加书籍" + bookInfo.getBookName(),Toast.LENGTH_SHORT).show();
+                            BookManager.addBook(bookInfo);
+                            notice();
+                        }
+                    });
                 }
             }
         });
+    }
+
+    private void notice() {
+        getFragmentManager().getFragments().get(0).onResume();
+    }
+
+    private String getListUrl(String url) {
+        String listUrl = url.replace("book","booklist");
+        listUrl = listUrl.substring(0,listUrl.length()-2) + ".html";
+        return listUrl;
     }
 }

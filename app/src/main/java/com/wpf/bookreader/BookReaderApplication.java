@@ -4,6 +4,7 @@ import android.app.Application;
 import android.graphics.Color;
 
 import com.socks.library.KLog;
+import com.wpf.bookreader.DataBase.greendao.gen.BookInfoDao;
 import com.wpf.bookreader.DataBase.greendao.gen.ChapterInfoDao;
 import com.wpf.bookreader.DataBase.greendao.gen.DaoMaster;
 import com.wpf.bookreader.DataBase.greendao.gen.DaoSession;
@@ -22,6 +23,7 @@ import okhttp3.OkHttpClient;
 public class BookReaderApplication extends Application {
 
     public static OkHttpClient okHttpClient;
+    public static BookInfoDao bookInfoDao;
     public static ChapterInfoDao chapterInfoDao;
 
     private List<ColorInfo> colorInfoList = new ArrayList<>();
@@ -53,6 +55,7 @@ public class BookReaderApplication extends Application {
         DaoMaster daoMaster = new DaoMaster(devOpenHelper.getWritableDatabase());
         DaoSession daoSession = daoMaster.newSession();
         chapterInfoDao = daoSession.getChapterInfoDao();
+        bookInfoDao = daoSession.getBookInfoDao();
     }
 
     public List<ColorInfo> getColorInfoList() {

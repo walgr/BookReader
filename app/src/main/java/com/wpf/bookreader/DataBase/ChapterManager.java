@@ -37,7 +37,9 @@ public class ChapterManager {
         }
     }
 
-    public static List<ChapterInfo> getChapterInfoList() {
-        return chapterInfoDao.queryBuilder().list();
+    public static List<ChapterInfo> getChapterInfoList(String bookUrl) {
+        return chapterInfoDao.queryBuilder()
+                .where(ChapterInfoDao.Properties.BookUrl.eq(bookUrl))
+                .list();
     }
 }

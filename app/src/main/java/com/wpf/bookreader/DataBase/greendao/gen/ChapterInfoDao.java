@@ -26,8 +26,9 @@ public class ChapterInfoDao extends AbstractDao<ChapterInfo, String> {
     public static class Properties {
         public final static Property Position = new Property(0, int.class, "position", false, "POSITION");
         public final static Property Url = new Property(1, String.class, "url", true, "URL");
-        public final static Property ChapterName = new Property(2, String.class, "chapterName", false, "CHAPTER_NAME");
-        public final static Property ChapterPageContent = new Property(3, String.class, "chapterPageContent", false, "CHAPTER_PAGE_CONTENT");
+        public final static Property BookUrl = new Property(2, String.class, "bookUrl", false, "BOOK_URL");
+        public final static Property ChapterName = new Property(3, String.class, "chapterName", false, "CHAPTER_NAME");
+        public final static Property ChapterPageContent = new Property(4, String.class, "chapterPageContent", false, "CHAPTER_PAGE_CONTENT");
     }
 
 
@@ -45,8 +46,9 @@ public class ChapterInfoDao extends AbstractDao<ChapterInfo, String> {
         db.execSQL("CREATE TABLE " + constraint + "\"CHAPTER_INFO\" (" + //
                 "\"POSITION\" INTEGER NOT NULL ," + // 0: position
                 "\"URL\" TEXT PRIMARY KEY NOT NULL ," + // 1: url
-                "\"CHAPTER_NAME\" TEXT," + // 2: chapterName
-                "\"CHAPTER_PAGE_CONTENT\" TEXT);"); // 3: chapterPageContent
+                "\"BOOK_URL\" TEXT," + // 2: bookUrl
+                "\"CHAPTER_NAME\" TEXT," + // 3: chapterName
+                "\"CHAPTER_PAGE_CONTENT\" TEXT);"); // 4: chapterPageContent
     }
 
     /** Drops the underlying database table. */
@@ -65,14 +67,19 @@ public class ChapterInfoDao extends AbstractDao<ChapterInfo, String> {
             stmt.bindString(2, url);
         }
  
+        String bookUrl = entity.getBookUrl();
+        if (bookUrl != null) {
+            stmt.bindString(3, bookUrl);
+        }
+ 
         String chapterName = entity.getChapterName();
         if (chapterName != null) {
-            stmt.bindString(3, chapterName);
+            stmt.bindString(4, chapterName);
         }
  
         String chapterPageContent = entity.getChapterPageContent();
         if (chapterPageContent != null) {
-            stmt.bindString(4, chapterPageContent);
+            stmt.bindString(5, chapterPageContent);
         }
     }
 
@@ -86,14 +93,19 @@ public class ChapterInfoDao extends AbstractDao<ChapterInfo, String> {
             stmt.bindString(2, url);
         }
  
+        String bookUrl = entity.getBookUrl();
+        if (bookUrl != null) {
+            stmt.bindString(3, bookUrl);
+        }
+ 
         String chapterName = entity.getChapterName();
         if (chapterName != null) {
-            stmt.bindString(3, chapterName);
+            stmt.bindString(4, chapterName);
         }
  
         String chapterPageContent = entity.getChapterPageContent();
         if (chapterPageContent != null) {
-            stmt.bindString(4, chapterPageContent);
+            stmt.bindString(5, chapterPageContent);
         }
     }
 
@@ -107,8 +119,9 @@ public class ChapterInfoDao extends AbstractDao<ChapterInfo, String> {
         ChapterInfo entity = new ChapterInfo( //
             cursor.getInt(offset + 0), // position
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // url
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // chapterName
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // chapterPageContent
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // bookUrl
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // chapterName
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // chapterPageContent
         );
         return entity;
     }
@@ -117,8 +130,9 @@ public class ChapterInfoDao extends AbstractDao<ChapterInfo, String> {
     public void readEntity(Cursor cursor, ChapterInfo entity, int offset) {
         entity.setPosition(cursor.getInt(offset + 0));
         entity.setUrl(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setChapterName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setChapterPageContent(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setBookUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setChapterName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setChapterPageContent(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override
