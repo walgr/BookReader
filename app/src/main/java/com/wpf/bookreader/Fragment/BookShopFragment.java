@@ -15,7 +15,7 @@ import com.wpf.bookreader.DataBase.BookInfo;
 import com.wpf.bookreader.DataBase.BookManager;
 import com.wpf.bookreader.DataBase.ChapterInfo;
 import com.wpf.bookreader.R;
-import com.wpf.bookreader.Utils.GetBookInfoByUrl;
+import com.wpf.bookreader.Utils.BookInfoManager;
 import com.wpf.bookreader.Utils.GetStringByUrl;
 
 import java.util.List;
@@ -58,11 +58,11 @@ public class BookShopFragment extends BaseFragment implements
             @Override
             public void onSuccess(List<ChapterInfo> result) {
                 if(!result.isEmpty()) {
-                    new GetBookInfoByUrl().get(bookShop.getUrl(), new GetBookInfoByUrl.OnBookScanFinish() {
+                    new BookInfoManager().get(bookShop.getUrl(), new BookInfoManager.OnBookScanFinish() {
                         @Override
                         public void onSuccess(BookInfo bookInfo) {
                             Toast.makeText(getContext(),"添加书籍" + bookInfo.getBookName(),Toast.LENGTH_SHORT).show();
-                            BookManager.addBook(bookInfo);
+                            BookManager.saveBook(bookInfo);
                             notice();
                         }
                     });
@@ -72,12 +72,13 @@ public class BookShopFragment extends BaseFragment implements
     }
 
     private void notice() {
-        getFragmentManager().getFragments().get(0).onResume();
+        ((BookShelveFragment)getFragmentManager().getFragments().get(0)).doNotify();
     }
 
     private String getListUrl(String url) {
         String listUrl = url.replace("book","booklist");
-        listUrl = listUrl.substring(0,listUrl.length()-2) + ".html";
+        if(listUrl.endsWith("/")) listUrl = listUrl.substring(0,listUrl.length()-1);
+        listUrl += ".html";
         return listUrl;
     }
 }

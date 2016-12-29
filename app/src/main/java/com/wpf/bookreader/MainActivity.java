@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        ((BookShelveFragment)fragmentList.get(0)).doNotify();
     }
 
     private void init() {

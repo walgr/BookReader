@@ -104,10 +104,10 @@ public class PageView extends View implements
         drawTitle();
         drawBattery();
         drawTime();
-        drawText(text);
+        drawText();
     }
 
-    private void drawText(String text) {
+    private void drawText() {
         if(text.isEmpty()) return;
         String[] strings = text.split("\n");
         int i = 1;
@@ -156,9 +156,7 @@ public class PageView extends View implements
     }
 
     private int getLineLen(String string,int start) {
-        int len = 1;
-        while (getTextWidth(paintContent,string.substring(start, start+len)) <= viewInfo.getWidth()) if (start+len++>=string.length()) break;
-        return len-1;
+        return paintContent.breakText(string.substring(start),true,viewInfo.getWidth(),null);
     }
 
     public void setText(String text) {

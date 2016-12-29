@@ -9,8 +9,13 @@ import android.os.Parcelable;
  */
 
 public class Position implements Parcelable {
-    public int chapterPosition;
-    public int pagePosition;
+    public int chapterPosition = 0;
+    public int pagePosition = 0;
+
+    public Position(int chapterPosition, int pagePosition) {
+        this.chapterPosition = chapterPosition;
+        this.pagePosition = pagePosition;
+    }
 
     @Override
     public int describeContents() {

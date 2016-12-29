@@ -3,6 +3,7 @@
     package="com.wpf.bookreader">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 
     <application
         android:name=".BookReaderApplication"
@@ -21,8 +22,6 @@
         <activity android:name=".BookInfoActivity"
             android:label="@string/str_bookinfo"/>
         <activity android:name=".ReadActivity"
-            android:launchMode="standard"
-            android:singleUser="true"
             android:theme="@style/FullscreenTheme">
 
         </activity>

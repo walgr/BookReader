@@ -9,6 +9,7 @@ import com.wpf.bookreader.DataBase.ChapterInfo;
 import com.wpf.bookreader.DataInfo.PageInfo;
 import com.wpf.bookreader.DataInfo.ViewInfo;
 import com.wpf.bookreader.Fragment.PageFragment;
+import com.wpf.bookreader.Utils.Tools;
 import com.wpf.bookreader.Widget.PageView;
 
 import java.util.ArrayList;
@@ -36,11 +37,11 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         int chapterPosition = getChapterPosition(position);
         int pagePosition = getPagePosition(position,chapterPosition);
-        if(chapterInfoList.get(chapterPosition).getChapterPageList().isEmpty()) {
+        if(Tools.isEmpty(chapterInfoList.get(chapterPosition).getChapterPageList())) {
             onInitNextChapter.startInit(chapterPosition);
         }
         String pageText = "";
-        if(!chapterInfoList.get(chapterPosition).getChapterPageList().isEmpty())
+        if(!Tools.isEmpty(chapterInfoList.get(chapterPosition).getChapterPageList()) && viewInfo.getWidth() != 0)
             pageText = chapterInfoList.get(chapterPosition).getChapterPageList().get(pagePosition);
         PageInfo pageInfo = new PageInfo(pagePosition, pageText);
         return PageFragment.newInstance(viewInfo,
@@ -51,7 +52,7 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
     public int getChapterPosition(int position) {
         int chapterSize = 0;
         for (ChapterInfo chapterInfo : chapterInfoList) {
-            if(!chapterInfo.getChapterPageList().isEmpty()) chapterSize += chapterInfo.getChapterPageList().size();
+            if(!Tools.isEmpty(chapterInfo.getChapterPageList())) chapterSize += chapterInfo.getChapterPageList().size();
             else chapterSize++;
             if(position < chapterSize)
                 return chapterInfo.getPosition();
@@ -59,7 +60,7 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
         return 0;
     }
 
-    private int getPagePosition(int position,int chapterPosition) {
+    public int getPagePosition(int position,int chapterPosition) {
         return position-getPageCount(0,chapterPosition);
     }
 
@@ -70,8 +71,9 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
 
     public int getPageCount(int start,int end) {
         int count = 0;
-        for(int i = start;i<end;++i) {
-            if(!chapterInfoList.get(i).getChapterPageList().isEmpty())
+        if(chapterInfoList.isEmpty()) return 0;
+        for(int i = start;i < end; ++i) {
+            if(!Tools.isEmpty(chapterInfoList.get(i).getChapterPageList()))
                 count+=chapterInfoList.get(i).getChapterPageList().size();
             else
                 count++;

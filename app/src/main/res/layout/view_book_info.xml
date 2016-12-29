@@ -13,17 +13,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            android:id="@+id/bookChapterList"/>
+            android:id="@+id/bookChapterList"
+            android:layout_marginTop="24dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            app:fabSize="normal"
             android:src="@drawable/ic_remove_red_eye_white_24dp"
-            android:id="@+id/read"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="16dp" />
+            android:id="@+id/btn"
+            android:layout_gravity="right"
+            android:layout_marginRight="8dp"
+            app:fabSize="mini" />
 
     </FrameLayout>
 

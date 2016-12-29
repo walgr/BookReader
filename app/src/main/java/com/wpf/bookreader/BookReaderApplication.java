@@ -4,10 +4,14 @@ import android.app.Application;
 import android.graphics.Color;
 
 import com.socks.library.KLog;
+import com.wpf.bookreader.DataBase.BookInfo;
+import com.wpf.bookreader.DataBase.UserSettingInfo;
+import com.wpf.bookreader.DataBase.UserSettingManager;
 import com.wpf.bookreader.DataBase.greendao.gen.BookInfoDao;
 import com.wpf.bookreader.DataBase.greendao.gen.ChapterInfoDao;
 import com.wpf.bookreader.DataBase.greendao.gen.DaoMaster;
 import com.wpf.bookreader.DataBase.greendao.gen.DaoSession;
+import com.wpf.bookreader.DataBase.greendao.gen.UserSettingInfoDao;
 import com.wpf.bookreader.DataInfo.ColorInfo;
 
 import java.util.ArrayList;
@@ -25,8 +29,10 @@ public class BookReaderApplication extends Application {
     public static OkHttpClient okHttpClient;
     public static BookInfoDao bookInfoDao;
     public static ChapterInfoDao chapterInfoDao;
+    public static UserSettingInfoDao userSettingInfoDao;
+    public static List<ColorInfo> colorInfoList = new ArrayList<>();
+    public static BookInfo bookInfo;
 
-    private List<ColorInfo> colorInfoList = new ArrayList<>();
     @Override
     public void onCreate() {
         super.onCreate();
@@ -56,9 +62,18 @@ public class BookReaderApplication extends Application {
         DaoSession daoSession = daoMaster.newSession();
         chapterInfoDao = daoSession.getChapterInfoDao();
         bookInfoDao = daoSession.getBookInfoDao();
+        userSettingInfoDao = daoSession.getUserSettingInfoDao();
+
+        UserSettingInfo tourist = createTourist();
+        if(UserSettingManager.getUserSettingInfo(tourist.getId()) == null)
+            UserSettingManager.saveUserSettingInfo(tourist);
     }
 
-    public List<ColorInfo> getColorInfoList() {
-        return colorInfoList;
+    private UserSettingInfo createTourist() {
+        UserSettingInfo tourist = new UserSettingInfo();
+        tourist.setId((long) 0);
+        tourist.setColorPos(0);
+        tourist.setTextSize(16);
+        return tourist;
     }
 }

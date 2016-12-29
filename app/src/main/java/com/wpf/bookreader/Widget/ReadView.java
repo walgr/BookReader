@@ -15,18 +15,22 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.wpf.bookreader.Adapter.PageListAdapter;
+import com.wpf.bookreader.BookReaderApplication;
+import com.wpf.bookreader.DataBase.BookInfo;
+import com.wpf.bookreader.DataBase.BookManager;
 import com.wpf.bookreader.DataBase.ChapterInfo;
 import com.wpf.bookreader.DataBase.ChapterManager;
+import com.wpf.bookreader.DataBase.UserSettingInfo;
+import com.wpf.bookreader.DataBase.UserSettingManager;
 import com.wpf.bookreader.DataInfo.ColorInfo;
 import com.wpf.bookreader.DataInfo.ViewInfo;
-import com.wpf.bookreader.FontListActivity;
 import com.wpf.bookreader.R;
 import com.wpf.bookreader.ReadActivity;
 import com.wpf.bookreader.Receiver.BatteryBroadcastReceiver;
 import com.wpf.bookreader.Receiver.TimeBroadcastReceiver;
-import com.wpf.bookreader.Utils.GetPageList;
 import com.wpf.bookreader.Utils.GetStringByUrl;
-import com.wpf.bookreader.Utils.SaveInfo;
+import com.wpf.bookreader.Utils.PageListManager;
+import com.wpf.bookreader.Utils.Tools;
 import com.wpf.bookreader.View.ViewBase;
 import com.wpf.bookreader.View.View_ActionBar;
 import com.wpf.bookreader.View.View_ActionSet;
@@ -36,6 +40,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
+import static com.wpf.bookreader.Utils.Tools.px2sp;
+import static com.wpf.bookreader.Utils.Tools.sp2px;
 
 /**
  * Created by 王朋飞 on 12-19-0019.
@@ -57,18 +65,19 @@ public class ReadView extends LinearLayout implements
     private BatteryBroadcastReceiver receiverBattery;
     private TimeBroadcastReceiver receiverTime;
     private View backView;
-    private LinearLayout white_space;
     private ViewBase actionBar;
     public ViewBase actionSet;
-    public ViewBase actionSetDetail;
+    public ViewBase actionDetailSet;
 
     private NoScrollViewPager pageList;
     private PageListAdapter pageListAdapter;
-    private ArrayList<ChapterInfo> bookChapterList = new ArrayList<>();
+    private List<ChapterInfo> bookChapterList = new ArrayList<>();
+    private List<ChapterInfo> initChapterList = new ArrayList<>();
+    private UserSettingInfo userSettingInfo = UserSettingManager.getUserSettingInfo((long) 0);
     private ViewInfo viewInfo = new ViewInfo();
-    private ColorInfo colorInfo = new ColorInfo();
-    private int curChapterPosition;
-    private boolean isActionShow;
+    private BookInfo bookInfo = new BookInfo();
+    private int curChapterPosition, curPagePosition;
+    private boolean isActionShow, isBackResult;
 
     public ReadView(Context context) {
         this(context,null);
@@ -88,30 +97,30 @@ public class ReadView extends LinearLayout implements
                 .inflate(R.layout.readview,this,false);
         pageList = (NoScrollViewPager) view.findViewById(R.id.pageList);
         pageList.setScrollable(true);
-//        pageList.setOffscreenPageLimit(5);
         pageListAdapter = new PageListAdapter(((ReadActivity)getContext()).getSupportFragmentManager(),viewInfo,this);
         pageListAdapter.setOnInitNextChapter(this);
         pageList.setAdapter(pageListAdapter);
         pageList.addOnPageChangeListener(this);
         backView = view.findViewById(R.id.backView);
         FrameLayout actionView = (FrameLayout) view.findViewById(R.id.actionView);
-        white_space = (LinearLayout) view.findViewById(R.id.white_space);
-        actionBar = new View_ActionBar(getContext()).initView(actionView);
-        actionSet = new View_ActionSet(getContext()).initView(actionView);
-        actionSetDetail = new View_DetailSet(getContext()).initView(actionView);
+        LinearLayout white_space = (LinearLayout) view.findViewById(R.id.white_space);
+        actionBar = new View_ActionBar(this).initView(actionView);
+        actionSet = new View_ActionSet(this).initView(actionView);
+        actionDetailSet = new View_DetailSet(this).initView(actionView);
         white_space.setOnClickListener(this);
         ((View_ActionSet)actionSet).setOnCloseListener(this);
-        ((View_DetailSet)actionSetDetail).setOnRequestWriteSettingListener(this);
-        ((View_DetailSet)actionSetDetail).setOnSizeChaneListener(this);
-        ((View_DetailSet)actionSetDetail).setOnColorChangeListener(this);
+        ((View_DetailSet) actionDetailSet).setOnRequestWriteSettingListener(this);
+        ((View_DetailSet) actionDetailSet).setOnSizeChaneListener(this);
+        ((View_DetailSet) actionDetailSet).setOnColorChangeListener(this);
         getViewInfo();
         addView(view);
     }
 
     private void getViewInfo() {
-        viewInfo.setTypefaceName(SaveInfo.getFontName(getContext()));
-        viewInfo.setTextSize(sp2px(getContext(),16));
-        viewInfo.setTextColor(colorInfo.getColorText());
+        viewInfo.setTypefaceName(userSettingInfo.getFontName());
+        viewInfo.setTextSize(sp2px(getContext(),userSettingInfo.getTextSize()));
+        viewInfo.setTextColor(BookReaderApplication.colorInfoList
+                .get(userSettingInfo.getColorPos()).getColorText());
         viewInfo.setSpacingVertical(30);
         viewInfo.setTime(getTime());
     }
@@ -122,12 +131,16 @@ public class ReadView extends LinearLayout implements
         viewInfo.setPaddingTop(viewInfo.getHeight()/20);
         viewInfo.setPaddingLeft(viewInfo.getWidth()/30);
         viewInfo.setPaddingBottom(viewInfo.getHeight()/40);
-        ((View_DetailSet)actionSetDetail).setTextSize(viewInfo.getTextSize());
+        ((View_DetailSet) actionDetailSet).setTextSize(viewInfo.getTextSize());
     }
 
-    private int sp2px(Context context, float spValue) {
-        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
-        return (int) (spValue * fontScale + 0.5f);
+    public ReadView setBackResult(boolean backResult) {
+        isBackResult = backResult;
+        return this;
+    }
+
+    public boolean isBackResult() {
+        return isBackResult;
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -137,7 +150,9 @@ public class ReadView extends LinearLayout implements
 
     private void initPage(int chapterPosition) {
         final ChapterInfo chapterInfo = bookChapterList.get(chapterPosition);
-        new GetStringByUrl().getChapterContentByUrl(chapterInfo.getUrl(), chapterInfo.getChapterName(), new GetStringByUrl.OnTextFinish() {
+        if(initChapterList.contains(chapterInfo)) return;
+        initChapterList.add(chapterInfo);
+        new GetStringByUrl().getChapterContentByUrl(chapterInfo, new GetStringByUrl.OnTextFinish() {
             @Override
             public void onSuccess(String textInfo) {
                 chapterInfo.setChapterPageContent(textInfo);
@@ -149,21 +164,23 @@ public class ReadView extends LinearLayout implements
 
     private void initPageList(final ChapterInfo chapterInfo) {
 //        pageList.setScrollable(false);
-        new GetPageList().getAPageText(getContext(), chapterInfo.getChapterPageContent(),
-                viewInfo, new GetPageList.OnTextFinish() {
+        new PageListManager().getPageText(getContext(), chapterInfo.getChapterPageContent(),
+                viewInfo, new PageListManager.OnTextFinish() {
                     @Override
                     public void onSuccess(List<String> pageTextList) {
                         chapterInfo.setChapterPageList(pageTextList);
                         pageListAdapter.notifyDataSetChanged();
-                        pageList.setCurrentItem(pageListAdapter.getPageCount(0,curChapterPosition),false);
+                        pageList.setCurrentItem(pageListAdapter.getPageCount(0,curChapterPosition) + curPagePosition,false);
+                        initChapterList.remove(chapterInfo);
 //                        pageList.setScrollable(true);
                     }
         });
     }
 
-    public ReadView setChapterInfo(ArrayList<ChapterInfo> bookChapterList) {
+    public ReadView setChapterList(List<ChapterInfo> bookChapterList) {
         this.bookChapterList = bookChapterList;
-        pageListAdapter.setChapterInfoList(bookChapterList);
+        if(pageListAdapter != null)
+            pageListAdapter.setChapterInfoList(bookChapterList);
         return this;
     }
 
@@ -176,6 +193,7 @@ public class ReadView extends LinearLayout implements
     @Override
     public void onPageSelected(int position) {
         curChapterPosition = pageListAdapter.getChapterPosition(position);
+        curPagePosition = pageListAdapter.getPagePosition(position,curChapterPosition);
     }
 
     @Override
@@ -193,7 +211,7 @@ public class ReadView extends LinearLayout implements
     }
 
     public void onResume() {
-        ((View_DetailSet)actionSetDetail).onResume();
+        ((View_DetailSet) actionDetailSet).onResume();
         //电量变化监听
         receiverBattery = new BatteryBroadcastReceiver();
         receiverBattery.setOnBatteryChangeListener(this);
@@ -208,12 +226,24 @@ public class ReadView extends LinearLayout implements
     }
 
     public void onPause() {
+        if(receiverBattery == null || receiverTime == null) return;
         getContext().unregisterReceiver(receiverBattery);
         getContext().unregisterReceiver(receiverTime);
     }
 
+    public void onDestroy() {
+        saveBookInfo();
+    }
+
+    private void saveBookInfo() {
+        if(bookInfo == null) return;
+        bookInfo.setChapterPosition(curChapterPosition);
+        bookInfo.setPagePosition(curPagePosition);
+        BookManager.saveBook(bookInfo);
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(requestCode == 1 && resultCode == FontListActivity.RESULT_OK) {
+        if(requestCode == 1 && resultCode == RESULT_OK) {
             String fontPathName = data.getStringExtra("FontName");
             changFont(fontPathName);
             String fontName = fontPathName;
@@ -221,7 +251,12 @@ public class ReadView extends LinearLayout implements
                 fontName = fontPathName.split("/")[1];
             if(fontName.contains("."))
                 fontName = fontName.split("\\.")[0];
-            ((View_DetailSet)actionSetDetail).refreshFont(fontName);
+            ((View_DetailSet) actionDetailSet).refreshFont(fontName);
+        } else if(requestCode == 2 && resultCode == RESULT_OK) {
+            if(data == null) return;
+            int position = data.getIntExtra("Position",-1);
+            setCurChapterPosition(position);
+            isBackResult = true;
         }
     }
 
@@ -240,15 +275,16 @@ public class ReadView extends LinearLayout implements
     @Override
     public void onOtherActionClose() {
         notShowAction();
-        white_space.setVisibility(View.VISIBLE);
-        actionSetDetail.showAction();
     }
 
     @Override
-    public void change(ColorInfo colorInfo) {
+    public void colorChange(int position) {
+        ColorInfo colorInfo = BookReaderApplication.colorInfoList.get(position);
         backView.setBackgroundColor(colorInfo.getColorBack());
         viewInfo.setTextColor(colorInfo.getColorText());
         pageListAdapter.setViewInfo(viewInfo);
+        userSettingInfo.setColorPos(position);
+        UserSettingManager.saveUserSettingInfo(userSettingInfo);
     }
 
     @Override
@@ -257,22 +293,26 @@ public class ReadView extends LinearLayout implements
     }
 
     @Override
-    public void change(int size) {
+    public void sizeChange(int size) {
         viewInfo.setTextSize(size);
         initPageList(bookChapterList.get(pageListAdapter.getChapterPosition(pageList.getCurrentItem())));
         for(ChapterInfo chapterInfo : bookChapterList) {
-            if(!chapterInfo.getChapterPageList().isEmpty())
+            if(!Tools.isEmpty(chapterInfo.getChapterPageList()))
                 initPageList(chapterInfo);
         }
+        userSettingInfo.setTextSize(px2sp(getContext(),size));
+        UserSettingManager.saveUserSettingInfo(userSettingInfo);
     }
 
     private void changFont(String fontPathName) {
         viewInfo.setTypefaceName(fontPathName);
         initPageList(bookChapterList.get(pageListAdapter.getChapterPosition(pageList.getCurrentItem())));
         for(ChapterInfo chapterInfo : bookChapterList) {
-            if(!chapterInfo.getChapterPageList().isEmpty())
+            if(!Tools.isEmpty(chapterInfo.getChapterPageList()))
                 initPageList(chapterInfo);
         }
+        userSettingInfo.setFontName(fontPathName);
+        UserSettingManager.saveUserSettingInfo(userSettingInfo);
     }
 
     @Override
@@ -292,15 +332,13 @@ public class ReadView extends LinearLayout implements
     private void showAction() {
         actionBar.showAction();
         actionSet.showAction();
-        white_space.setVisibility(View.VISIBLE);
         isActionShow = true;
     }
 
     public void notShowAction() {
         actionBar.notShowAction();
         actionSet.notShowAction();
-        white_space.setVisibility(View.GONE);
-        actionSetDetail.notShowAction();
+        actionDetailSet.notShowAction();
         isActionShow = false;
     }
 
@@ -311,7 +349,20 @@ public class ReadView extends LinearLayout implements
 
     public ReadView setCurChapterPosition(int curChapterPosition) {
         this.curChapterPosition = curChapterPosition;
-        pageList.setCurrentItem(curChapterPosition,false);
+        this.curPagePosition = 0;
+        pageList.setCurrentItem(pageListAdapter.getPageCount(0,curChapterPosition) + curPagePosition,false);
+        return this;
+    }
+
+    public ReadView setCurPagePosition(int curPagePosition) {
+        this.curPagePosition = curPagePosition;
+        pageList.setCurrentItem(pageListAdapter.getPageCount(0,curChapterPosition) + curPagePosition,false);
+        return this;
+    }
+
+    public ReadView setBookInfo(BookInfo bookInfo) {
+        if(bookInfo == null) return this;
+        this.bookInfo = bookInfo;
         return this;
     }
 }

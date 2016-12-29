@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.wpf.bookreader.DataBase.BookInfo;
 import com.wpf.bookreader.DataBase.ChapterInfo;
 import com.wpf.bookreader.Widget.ReadView;
 
@@ -12,8 +13,8 @@ import java.util.ArrayList;
 public class ReadActivity extends AppCompatActivity {
 
     private ReadView readView;
+    private BookInfo bookInfo = BookReaderApplication.bookInfo;
     private ArrayList<ChapterInfo> bookChapterList = new ArrayList<>();
-    private ChapterInfo chapterInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,19 +25,21 @@ public class ReadActivity extends AppCompatActivity {
 
     private void init() {
         readView = (ReadView) findViewById(R.id.readView);
-
-        Intent intent = getIntent();
-        if(intent == null) return;
-        bookChapterList = intent.getParcelableArrayListExtra("ChapterInfoList");
-        chapterInfo = intent.getParcelableExtra("ClickChapterInfo");
-        readView.setChapterInfo(bookChapterList);
-        readView.setCurChapterPosition(chapterInfo.getPosition());
+        bookChapterList = getIntent().getParcelableArrayListExtra("ChapterInfoList");
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) readView.initView();
+        if (hasFocus) {
+            readView.initView();
+            readView.setBookInfo(bookInfo);
+            readView.setChapterList(bookChapterList);
+            if(!readView.isBackResult()) {
+                readView.setCurChapterPosition(bookInfo.getChapterPosition());
+                readView.setCurPagePosition(bookInfo.getPagePosition());
+            }
+        }
     }
 
     @Override
@@ -54,13 +57,19 @@ public class ReadActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-         readView.onActivityResult(requestCode,resultCode,data);
+        readView.onActivityResult(requestCode,resultCode,data);
     }
 
     @Override
     public void onBackPressed() {
-        if(readView.actionSet.isShow || readView.actionSetDetail.isShow) {
+        if(readView.actionSet.isShow || readView.actionDetailSet.isShow) {
             readView.notShowAction();
         } else finish();
+    }
+
+    @Override
+    public void finish() {
+        readView.onDestroy();
+        super.finish();
     }
 }

@@ -32,10 +32,10 @@ public class GetStringByUrl {
         KLog.a("正在获取小说网址:"+url+"目录");
     }
 
-    public void getChapterContentByUrl(String url, String name, OnTextFinish onTextFinish) {
+    public void getChapterContentByUrl(ChapterInfo chapterInfo, OnTextFinish onTextFinish) {
         this.onTextFinish = onTextFinish;
-        new MyGetTextAsyncTask().execute(url,name);
-        KLog.a("正在获取章节"+name+"内容");
+        new MyGetTextAsyncTask().execute(chapterInfo.getUrl(),chapterInfo.getChapterName());
+        KLog.a("正在获取章节"+chapterInfo.getChapterName()+"内容");
     }
 
     private class MyGetListAsyncTask extends AsyncTask<String,Integer,List<ChapterInfo>> {
@@ -110,13 +110,13 @@ public class GetStringByUrl {
         return string;
     }
 
-    public static String getInfoByUrl(String url) throws IOException {
+    private static String getInfoByUrl(String url) throws IOException {
         Request request = new Request.Builder().url(url).build();
         Response response = BookReaderApplication.okHttpClient.newCall(request).execute();
         return new String(response.body().bytes(),"GBK");
     }
 
-    public static List<String> getSubString(String str,String start,String end) {
+    private static List<String> getSubString(String str,String start,String end) {
         List<String> strings = new ArrayList<>();
         if(!(str.contains(start) && str.contains(end))) return strings;
         List<Integer> indexList = new ArrayList<>();
@@ -140,7 +140,7 @@ public class GetStringByUrl {
         return strings;
     }
 
-    public static List<String> getTitleString(String str, String start, String end) {
+    private static List<String> getTitleString(String str, String start, String end) {
         List<String> strings = new ArrayList<>();
         List<Integer> indexList = new ArrayList<>();
         int index_start;
@@ -165,7 +165,7 @@ public class GetStringByUrl {
     private ChapterInfo getChapter(String string) {
         ChapterInfo chapterInfo = new ChapterInfo();
         try {
-            chapterInfo.setUrl(getTitleString(string,"<a href='","'>").get(0));
+            chapterInfo.setUrl("http://m.qu.la"+getTitleString(string,"<a href='","'>").get(0));
             chapterInfo.setChapterName(getTitleString(string,">","</a>").get(0));
         } catch (IndexOutOfBoundsException ignored) {}
 

@@ -8,7 +8,6 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +17,7 @@ import java.util.List;
 
 @Entity
 public class ChapterInfo implements Parcelable {
+
     private int position = 0;
     @Id
     //章节url地址
@@ -28,11 +28,13 @@ public class ChapterInfo implements Parcelable {
 
     //章节名称
     private String chapterName = "";
+
     //章节内容
     private String chapterPageContent = "";
+
     @Transient
     //章节分页内容
-    private List<String> chapterPageList = new ArrayList<>();
+    private List<String> chapterPageList;
 
     @Generated(hash = 1686365921)
     public ChapterInfo(int position, String url, String bookUrl, String chapterName,
@@ -57,24 +59,6 @@ public class ChapterInfo implements Parcelable {
         return this;
     }
 
-//    public int getChapterPosition() {
-//        return position.chapterPosition;
-//    }
-//
-//    public int getPagePosition() {
-//        return position.pagePosition;
-//    }
-//
-//    public ChapterInfo setChapterPosition(int chapterPosition) {
-//        position.chapterPosition = chapterPosition;
-//        return this;
-//    }
-//
-//    public ChapterInfo setPagePosition(int pagePosition) {
-//        position.pagePosition = pagePosition;
-//        return this;
-//    }
-
     public String getChapterName() {
         return chapterName;
     }
@@ -85,12 +69,20 @@ public class ChapterInfo implements Parcelable {
     }
 
     public String getUrl() {
-        return "http://m.qu.la"+url;
+        return url;
     }
 
     public ChapterInfo setUrl(String url) {
         this.url = url;
         return this;
+    }
+
+    public String getBookUrl() {
+        return this.bookUrl;
+    }
+
+    public void setBookUrl(String bookUrl) {
+        this.bookUrl = bookUrl;
     }
 
     public String getChapterPageContent() {
@@ -103,7 +95,7 @@ public class ChapterInfo implements Parcelable {
     }
 
     public List<String> getChapterPageList() {
-        return chapterPageList ==null?new ArrayList<String>(): chapterPageList;
+        return chapterPageList;
     }
 
     public ChapterInfo setChapterPageList(List<String> chapterPageList) {
@@ -120,22 +112,16 @@ public class ChapterInfo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.position);
         dest.writeString(this.url);
+        dest.writeString(this.bookUrl);
         dest.writeString(this.chapterName);
         dest.writeString(this.chapterPageContent);
         dest.writeStringList(this.chapterPageList);
     }
 
-    public String getBookUrl() {
-        return this.bookUrl;
-    }
-
-    public void setBookUrl(String bookUrl) {
-        this.bookUrl = bookUrl;
-    }
-
     protected ChapterInfo(Parcel in) {
         this.position = in.readInt();
         this.url = in.readString();
+        this.bookUrl = in.readString();
         this.chapterName = in.readString();
         this.chapterPageContent = in.readString();
         this.chapterPageList = in.createStringArrayList();

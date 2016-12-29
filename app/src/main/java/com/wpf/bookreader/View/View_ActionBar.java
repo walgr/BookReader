@@ -1,6 +1,5 @@
 package com.wpf.bookreader.View;
 
-import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +7,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 
 import com.wpf.bookreader.R;
+import com.wpf.bookreader.Widget.ReadView;
 
 
 /**
@@ -17,8 +17,8 @@ import com.wpf.bookreader.R;
 
 public class View_ActionBar extends ViewBase {
 
-    public View_ActionBar(Context context) {
-        this.context = context;
+    public View_ActionBar(ReadView readView) {
+        this.context = readView.getContext();
     }
 
     @Override

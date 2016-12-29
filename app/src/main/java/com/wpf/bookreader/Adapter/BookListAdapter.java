@@ -23,6 +23,7 @@ import java.util.List;
 public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyViewHolder> {
 
     private OnItemClickListener onItemClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
     private Context context;
     private List<BookInfo> bookInfoList = new ArrayList<>();
 
@@ -61,8 +62,14 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
         return this;
     }
 
+    public BookListAdapter setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
+        this.onItemLongClickListener = onItemLongClickListener;
+        return this;
+    }
+
     class MyViewHolder extends RecyclerView.ViewHolder implements
-            View.OnClickListener {
+            View.OnClickListener,
+            View.OnLongClickListener {
 
         private ImageView bookImg;
         private TextView bookName;
@@ -72,11 +79,17 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyView
             bookImg = (ImageView) itemView.findViewById(R.id.bookImg);
             bookName = (TextView) itemView.findViewById(R.id.bookName);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            onItemClickListener.onClick(getAdapterPosition());
+            if(onItemClickListener != null) onItemClickListener.onClick(getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            return (onItemClickListener != null) && onItemLongClickListener.onLongClick(getAdapterPosition());
         }
     }
 }

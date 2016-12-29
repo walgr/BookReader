@@ -12,14 +12,17 @@ import android.widget.LinearLayout;
 
 import com.wpf.bookreader.Adapter.BookChapterListAdapter;
 import com.wpf.bookreader.Adapter.OnItemClickListener;
-import com.wpf.bookreader.DataBase.ChapterInfo;
-import com.wpf.bookreader.R;
+import com.wpf.bookreader.BookInfoActivity;
 import com.wpf.bookreader.DataBase.BookInfo;
-import com.wpf.bookreader.ReadActivity;
+import com.wpf.bookreader.DataBase.ChapterInfo;
+import com.wpf.bookreader.DataBase.ChapterManager;
+import com.wpf.bookreader.R;
 import com.wpf.bookreader.Utils.GetStringByUrl;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by 王朋飞 on 12-19-0019.
@@ -35,7 +38,8 @@ public class BookInfoView extends LinearLayout implements
     private ArrayList<ChapterInfo> bookChapterList = new ArrayList<>();
     private RecyclerView bookChapterListView;
     private BookChapterListAdapter bookChapterListAdapter;
-    private FloatingActionButton read;
+    private FloatingActionButton btn;
+    private boolean isDown = true;
 
     public BookInfoView(Context context) {
         this(context,null);
@@ -54,28 +58,31 @@ public class BookInfoView extends LinearLayout implements
         View view = LayoutInflater.from(getContext())
                 .inflate(R.layout.view_book_info,this,false);
         bookChapterListView = (RecyclerView) view.findViewById(R.id.bookChapterList);
-        read = (FloatingActionButton) view.findViewById(R.id.read);
+        btn = (FloatingActionButton) view.findViewById(R.id.btn);
 
-        bookChapterListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        bookChapterListView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,isDown=!isDown));
         bookChapterListAdapter = new BookChapterListAdapter(bookChapterList);
         bookChapterListAdapter.setOnItemClickListener(this);
         bookChapterListView.setAdapter(bookChapterListAdapter);
+
         addView(view);
     }
 
     private void initData() {
-        read.setOnClickListener(this);
-
+        btn.setOnClickListener(this);
+        bookChapterList = (ArrayList<ChapterInfo>) ChapterManager.getChapterInfoList(bookInfo.bookUrl);
+        bookChapterListAdapter.setBookList(bookChapterList);
         new GetStringByUrl().getChapterListByUrl(bookInfo.bookUrl, new GetStringByUrl.OnListFinish() {
             @Override
             public void onSuccess(List<ChapterInfo> result) {
                 bookChapterList = (ArrayList<ChapterInfo>) result;
-                bookChapterListAdapter.setBookList(result);
+                bookChapterListAdapter.setBookList(bookChapterList);
             }
         });
     }
 
     public BookInfoView setBookInfo(BookInfo bookInfo) {
+        if(bookInfo == null) return this;
         this.bookInfo = bookInfo;
         initData();
         return this;
@@ -83,14 +90,17 @@ public class BookInfoView extends LinearLayout implements
 
     @Override
     public void onClick(View view) {
-
+        bookChapterListView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,isDown=!isDown));
+        bookChapterListAdapter.notifyDataSetChanged();
+        if(isDown) bookChapterListView.scrollToPosition(bookChapterList.size()-1);
     }
 
     @Override
     public void onClick(int position) {
-        Intent intent = new Intent(getContext(), ReadActivity.class);
-        intent.putParcelableArrayListExtra("ChapterInfoList",bookChapterList);
-        intent.putExtra("ClickChapterInfo",bookChapterList.get(position));
-        getContext().startActivity(intent);
+        BookInfoActivity bookInfoActivity = ((BookInfoActivity)getContext());
+        Intent intent = bookInfoActivity.getIntent();
+        intent.putExtra("Position",position);
+        bookInfoActivity.setResult(RESULT_OK,intent);
+        bookInfoActivity.finish();
     }
 }

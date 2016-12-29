@@ -15,7 +15,7 @@ public abstract class ViewBase implements
 
     public boolean isShow;
     Context context;
-    View mView;
+    View mView,whiteSpace;
     Animation mAnimation_Start;
     Animation mAnimation_End;
 
@@ -33,6 +33,7 @@ public abstract class ViewBase implements
     public void showAction() {
         if(!isShow) {
             getView().setVisibility(View.VISIBLE);
+            if(whiteSpace != null) whiteSpace.setVisibility(View.VISIBLE);
             getView().startAnimation(mAnimation_Start);
             isShow = true;
         }
@@ -41,6 +42,7 @@ public abstract class ViewBase implements
     public void notShowAction() {
         if(isShow) {
             getView().startAnimation(mAnimation_End);
+            if(whiteSpace != null) whiteSpace.setVisibility(View.GONE);
             getView().setVisibility(View.GONE);
             isShow = false;
         }

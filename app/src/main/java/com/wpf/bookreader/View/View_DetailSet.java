@@ -1,6 +1,5 @@
 package com.wpf.bookreader.View;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
@@ -24,10 +23,14 @@ import com.wpf.bookreader.DataInfo.ColorInfo;
 import com.wpf.bookreader.FontListActivity;
 import com.wpf.bookreader.R;
 import com.wpf.bookreader.ReadActivity;
-import com.wpf.bookreader.Utils.SaveInfo;
-import com.wpf.bookreader.Utils.ScreenBrightness;
+import com.wpf.bookreader.Utils.FontManager;
+import com.wpf.bookreader.Utils.ScreenBrightnessManager;
+import com.wpf.bookreader.Widget.ReadView;
 
 import java.util.List;
+
+import static com.wpf.bookreader.Utils.Tools.px2sp;
+import static com.wpf.bookreader.Utils.Tools.sp2px;
 
 /**
  * Created by 王朋飞 on 11-29-0029.
@@ -47,11 +50,10 @@ public class View_DetailSet extends ViewBase implements
     private TextView textView_Size;
     private SeekBar seekBar_Screen;
     private CheckBox checkBox_Auto;
-    private RecyclerView recyclerView;
     private ColorListAdapter colorListAdapter;
 
-    public View_DetailSet(Context context) {
-        this.context = context;
+    public View_DetailSet(ReadView readView) {
+        this.context = readView.getContext();
     }
 
     @Override
@@ -62,7 +64,7 @@ public class View_DetailSet extends ViewBase implements
         Button button_add = (Button) getView().findViewById(R.id.button_add);
         button_font = (Button) getView().findViewById(R.id.button_font);
         seekBar_Screen = (SeekBar) getView().findViewById(R.id.seekBar_screen);
-        recyclerView = (RecyclerView) getView().findViewById(R.id.list_color);
+        RecyclerView recyclerView = (RecyclerView) getView().findViewById(R.id.list_color);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL,false));
         colorListAdapter = new ColorListAdapter(getColorList());
         colorListAdapter.setOnItemClickListener(this);
@@ -80,12 +82,12 @@ public class View_DetailSet extends ViewBase implements
     }
 
     public void onResume() {
-        seekBar_Screen.setProgress(ScreenBrightness.getScreenBrightness(context));
+        seekBar_Screen.setProgress(ScreenBrightnessManager.getScreenBrightness(context));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && Settings.System.canWrite(getActivity())) {
-            checkBox_Auto.setChecked(ScreenBrightness.isAutoScreenBrightness(context));
+            checkBox_Auto.setChecked(ScreenBrightnessManager.isAutoScreenBrightness(context));
         }
-        String fontName = SaveInfo.getFontName(getActivity());
+        String fontName = FontManager.getFontName(getActivity());
         if(fontName.contains("/"))
             fontName = fontName.split("/")[1];
         if(fontName.contains("."))
@@ -94,7 +96,7 @@ public class View_DetailSet extends ViewBase implements
     }
 
     private List<ColorInfo> getColorList() {
-        return ((BookReaderApplication)getActivity().getApplication()).getColorInfoList();
+        return BookReaderApplication.colorInfoList;
     }
 
     public void refreshFont(String typefaceName) {
@@ -111,6 +113,7 @@ public class View_DetailSet extends ViewBase implements
     public ViewBase initView(ViewGroup parent) {
         if(mView == null) {
             mView = parent.findViewById(R.id.my_action_detailed_set);
+            whiteSpace = parent.findViewById(R.id.white_space);
             init();
         }
         return this;
@@ -125,7 +128,7 @@ public class View_DetailSet extends ViewBase implements
             case R.id.button_add:
                 if(textSize > 30) return;
                 textSize += 2;
-                if(onSizeChaneListener != null) onSizeChaneListener.change(sp2px(getActivity(), textSize));
+                if(onSizeChaneListener != null) onSizeChaneListener.sizeChange(sp2px(getActivity(), textSize));
                 textView_Size.setText(String.valueOf(textSize));
                 break;
             case R.id.button_font:
@@ -143,17 +146,6 @@ public class View_DetailSet extends ViewBase implements
         textView_Size.setText(String.valueOf(this.textSize));
     }
 
-    private int px2sp(Context context, float pxValue) {
-        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
-        return (int) (pxValue / fontScale + 0.5f);
-    }
-
-
-    private int sp2px(Context context, float spValue) {
-        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
-        return (int) (spValue * fontScale + 0.5f);
-    }
-
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
@@ -167,7 +159,7 @@ public class View_DetailSet extends ViewBase implements
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         if(checkBox_Auto.isChecked()) {
-            seekBar.setProgress(ScreenBrightness.getScreenBrightness(context));
+            seekBar.setProgress(ScreenBrightnessManager.getScreenBrightness(context));
             return;
         }
         int progress = seekBar.getProgress()+min;
@@ -189,9 +181,9 @@ public class View_DetailSet extends ViewBase implements
                 onRequestWriteSettingListener.request();
             return;
         }
-        ScreenBrightness.setAutoScreenBrightness(getActivity(), b);
+        ScreenBrightnessManager.setAutoScreenBrightness(getActivity(), b);
         if (b) {
-            int progress = ScreenBrightness.getScreenBrightness(getActivity());
+            int progress = ScreenBrightnessManager.getScreenBrightness(getActivity());
             seekBar_Screen.setProgress(progress);
             changeScreenBrightness(progress);
         }
@@ -212,7 +204,7 @@ public class View_DetailSet extends ViewBase implements
     @Override
     public void onClick(int position) {
         colorListAdapter.setSelectPos(position);
-        onColorChangeListener.change(getColorList().get(position));
+        onColorChangeListener.colorChange(position);
     }
 
     public View_DetailSet setOnColorChangeListener(OnColorChangeListener onColorChangeListener) {
@@ -225,10 +217,10 @@ public class View_DetailSet extends ViewBase implements
     }
 
     public interface OnSizeChaneListener {
-        void change(int size);
+        void sizeChange(int size);
     }
 
     public interface OnColorChangeListener {
-        void change(ColorInfo colorInfo);
+        void colorChange(int position);
     }
 }

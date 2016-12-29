@@ -1,11 +1,8 @@
 package com.wpf.bookreader.DataBase;
 
 import android.database.sqlite.SQLiteConstraintException;
-
 import com.wpf.bookreader.DataBase.greendao.gen.ChapterInfoDao;
-
 import java.util.List;
-
 import static com.wpf.bookreader.BookReaderApplication.chapterInfoDao;
 
 /**
@@ -15,12 +12,12 @@ import static com.wpf.bookreader.BookReaderApplication.chapterInfoDao;
 
 public class ChapterManager {
 
-        public static void saveChapter(ChapterInfo chapterInfo) {
+    public static void saveChapter(ChapterInfo chapterInfo) {
         try {
             ChapterInfo chapter = getChapterInfo(chapterInfo.getUrl());
             if(chapter == null)
                 chapterInfoDao.insert(chapterInfo);
-            else if(!chapter.getChapterPageContent().isEmpty())
+            else if(!chapterInfo.getChapterPageContent().isEmpty())
                 chapterInfoDao.update(chapterInfo);
         } catch (SQLiteConstraintException e) {
             e.printStackTrace();
@@ -28,7 +25,8 @@ public class ChapterManager {
     }
 
     public static ChapterInfo getChapterInfo(String url) {
-        return chapterInfoDao.queryBuilder().where(ChapterInfoDao.Properties.Url.eq(url)).unique();
+        return chapterInfoDao.queryBuilder()
+                .where(ChapterInfoDao.Properties.Url.eq(url)).unique();
     }
 
     public static void saveChapterInfoList(List<ChapterInfo> chapterInfoList) {

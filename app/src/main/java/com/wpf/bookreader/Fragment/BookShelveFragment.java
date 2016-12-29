@@ -11,18 +11,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.socks.library.KLog;
 import com.wpf.bookreader.Adapter.BookListAdapter;
 import com.wpf.bookreader.Adapter.OnItemClickListener;
-import com.wpf.bookreader.BookInfoActivity;
+import com.wpf.bookreader.Adapter.OnItemLongClickListener;
+import com.wpf.bookreader.BookReaderApplication;
 import com.wpf.bookreader.DataBase.BookInfo;
 import com.wpf.bookreader.DataBase.BookManager;
+import com.wpf.bookreader.DataBase.ChapterInfo;
+import com.wpf.bookreader.DataBase.ChapterManager;
 import com.wpf.bookreader.R;
+import com.wpf.bookreader.ReadActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BookShelveFragment extends BaseFragment implements
-        OnItemClickListener {
+        OnItemClickListener,
+        OnItemLongClickListener {
 
     private RecyclerView bookList;
     private BookListAdapter bookListAdapter;
@@ -44,26 +50,37 @@ public class BookShelveFragment extends BaseFragment implements
         bookList.setLayoutManager(new GridLayoutManager(getContext(),3, LinearLayoutManager.VERTICAL,false));
         bookListAdapter = new BookListAdapter(bookInfoList);
         bookListAdapter.setOnItemClickListener(this);
+        bookListAdapter.setOnItemLongClickListener(this);
         bookList.setAdapter(bookListAdapter);
+        doNotify();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        bookInfoList = BookManager.getBookList();
-        bookListAdapter.setBookInfoList(bookInfoList);
+    public void doNotify() {
+        if(bookListAdapter != null) {
+            bookInfoList = BookManager.getBookList();
+            bookListAdapter.setBookInfoList(bookInfoList);
+        }
     }
 
     @Override
     public void onClick(int position) {
-        Intent intent = new Intent(getActivity(), BookInfoActivity.class);
-        intent.putExtra("BookInfo",bookInfoList.get(position));
+        Intent intent = new Intent(getActivity(), ReadActivity.class);
+        BookReaderApplication.bookInfo = bookInfoList.get(position);
+        intent.putParcelableArrayListExtra("ChapterInfoList", getChapterList(position));
         startActivity(intent);
     }
 
+    private ArrayList<ChapterInfo> getChapterList(int position) {
+        return (ArrayList<ChapterInfo>) ChapterManager.getChapterInfoList(bookInfoList.get(position).bookUrl);
+    }
+
     @Override
-    public void startActivity(Intent intent) {
-        super.startActivity(intent);
-        //getActivity().overridePendingTransition(R.anim.actionset_up,R.anim.zoom_enter);
+    public boolean onLongClick(int position) {
+        String name = bookInfoList.get(position).getBookName();
+        KLog.e("删除书籍" + name);
+        BookManager.delBook(name);
+        bookInfoList.remove(bookInfoList.get(position));
+        bookListAdapter.notifyDataSetChanged();
+        return true;
     }
 }

@@ -12,11 +12,15 @@ import java.util.List;
 
 public class BookManager {
 
-    public static void addBook(BookInfo bookInfo) {
+    public static void saveBook(BookInfo bookInfo) {
         if(getBook(bookInfo.bookUrl) == null)
             BookReaderApplication.bookInfoDao.insert(bookInfo);
         else
             BookReaderApplication.bookInfoDao.update(bookInfo);
+    }
+
+    public static void delBook(String name) {
+        BookReaderApplication.bookInfoDao.deleteByKey(name);
     }
 
     public static BookInfo getBook(String url) {
