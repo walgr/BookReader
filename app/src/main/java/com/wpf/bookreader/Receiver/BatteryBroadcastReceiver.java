@@ -16,7 +16,7 @@ public class BatteryBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)){
+        if(intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
             //得到系统当前电量
             int level=intent.getIntExtra("level", 0);
             //取得系统总电量
@@ -24,8 +24,7 @@ public class BatteryBroadcastReceiver extends BroadcastReceiver {
             int battery = (level*100)/total;
 
             if(battery != oldBattery) {
-                if(onBatteryChangeListener != null)
-                onBatteryChangeListener.batteryChange(battery);
+                if(onBatteryChangeListener != null) onBatteryChangeListener.batteryChange(battery);
                 oldBattery = battery;
             }
         }

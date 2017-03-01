@@ -1,6 +1,5 @@
 package com.wpf.bookreader.Fragment;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -71,7 +70,9 @@ public class BookShelveFragment extends BaseFragment implements
     }
 
     private ArrayList<ChapterInfo> getChapterList(int position) {
-        return (ArrayList<ChapterInfo>) ChapterManager.getChapterInfoList(bookInfoList.get(position).bookUrl);
+        List<ChapterInfo> chapterInfoList = ChapterManager.getChapterInfoList(bookInfoList.get(position).bookUrl);
+        if(chapterInfoList == null) return new ArrayList<>();
+        return (ArrayList<ChapterInfo>) chapterInfoList;
     }
 
     @Override

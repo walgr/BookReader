@@ -32,12 +32,6 @@ public class MainActivity extends AppCompatActivity implements
         init();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        ((BookShelveFragment)fragmentList.get(0)).doNotify();
-    }
-
     private void init() {
         viewPager_Home = (NoScrollViewPager) findViewById(R.id.viewPager_Home);
         pagerBottomTabLayout = (PagerBottomTabLayout) findViewById(R.id.tab);
@@ -54,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements
                 .addTabItem(R.drawable.ic_view_carousel,getString(R.string.str_bookshop))
                 .addTabItem(R.drawable.ic_perm_identity,getString(R.string.str_user))
                 .build().addTabItemClickListener(this);
-
     }
 
     private void getFragments() {

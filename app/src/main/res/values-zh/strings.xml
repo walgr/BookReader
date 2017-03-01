@@ -5,4 +5,5 @@
     <string name="str_bookshop">书城</string>
     <string name="str_user">用户</string>
     <string name="str_bookinfo">书籍信息</string>
+    <string name="str_fontList">字体列表</string>
 </resources>

@@ -23,10 +23,10 @@
             android:label="@string/str_bookinfo"/>
         <activity android:name=".ReadActivity"
             android:theme="@style/FullscreenTheme">
-
         </activity>
 
-        <activity android:name=".FontListActivity"/>
+        <activity android:name=".FontListActivity"
+            android:label="@string/str_fontList" />
     </application>
 
 </manifest>

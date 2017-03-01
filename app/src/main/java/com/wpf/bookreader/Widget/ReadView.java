@@ -60,7 +60,7 @@ public class ReadView extends LinearLayout implements
         View_DetailSet.OnRequestWriteSettingListener,
         View_DetailSet.OnColorChangeListener,
         BatteryBroadcastReceiver.OnBatteryChangeListener,
-        TimeBroadcastReceiver.OnTimeChangeListener{
+        TimeBroadcastReceiver.OnTimeChangeListener {
 
     private BatteryBroadcastReceiver receiverBattery;
     private TimeBroadcastReceiver receiverTime;
@@ -206,7 +206,7 @@ public class ReadView extends LinearLayout implements
                 !Settings.System.canWrite(getContext())) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
             intent.setData(Uri.parse("package:" + getContext().getPackageName()));
-            getContext().startActivity(intent);
+            ((ReadActivity)getContext()).startActivityForResult(intent,0);
         }
     }
 
@@ -356,6 +356,7 @@ public class ReadView extends LinearLayout implements
 
     public ReadView setCurPagePosition(int curPagePosition) {
         this.curPagePosition = curPagePosition;
+        pageListAdapter.setStart(true);
         pageList.setCurrentItem(pageListAdapter.getPageCount(0,curChapterPosition) + curPagePosition,false);
         return this;
     }

@@ -41,7 +41,6 @@ public class PageListManager {
         paint.setAntiAlias(true);
         paint.setSubpixelText(true);
         paint.setTextSize(viewInfo.getTextSize());
-        paint.setColor(viewInfo.getTextColor());
         if(!oldFontName.equals(viewInfo.getTypefaceName()))
             paint.setTypeface("系统默认".equals(viewInfo.getTypefaceName())? Typeface.DEFAULT:
                     Typeface.createFromAsset(context.getAssets(), viewInfo.getTypefaceName()));

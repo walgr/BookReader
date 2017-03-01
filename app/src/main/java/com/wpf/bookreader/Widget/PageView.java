@@ -133,12 +133,12 @@ public class PageView extends View implements
     }
 
     private void drawBattery() {
-        if(pathStroke.isEmpty()) {
+        if(viewInfo.getWidth() != 0 && pathStroke.isEmpty()) {
             int left = viewInfo.getPaddingLeft();
             int right = (int) (left+width_battery-paintBatteryStroke.getStrokeWidth());
             rect.left = (int) (left+paintBatteryStroke.getStrokeWidth());
             rect.top = (int) (getHeight()-getTextHeight(paintTime)/2-height_battery+paintBatteryStroke.getStrokeWidth());
-            rect.right = (int) (right * ((float)viewInfo.getBattery()/100));
+            rect.right = left + (int) ((right-left) * ((float)viewInfo.getBattery()/100.0));
             rect.bottom = (int) (getHeight()-getTextHeight(paintTime)/2-paintBatteryStroke.getStrokeWidth());
             int width = 3;
             pathStroke.moveTo(rect.left-width,rect.top-width);
@@ -151,8 +151,10 @@ public class PageView extends View implements
             pathStroke.lineTo(rect.left-width,rect.bottom+width);
             pathStroke.lineTo(rect.left-width,rect.top-width);
         }
-        canvas.drawPath(pathStroke,paintBatteryStroke);
-        canvas.drawRect(rect,paintBattery);
+        if(!pathStroke.isEmpty()) {
+            canvas.drawPath(pathStroke, paintBatteryStroke);
+            canvas.drawRect(rect, paintBattery);
+        }
     }
 
     private int getLineLen(String string,int start) {

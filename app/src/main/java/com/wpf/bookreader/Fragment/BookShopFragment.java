@@ -46,7 +46,6 @@ public class BookShopFragment extends BaseFragment implements
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request){
                 return false;
-
             }
         });
         saveInfoBookShelve.setOnClickListener(this);

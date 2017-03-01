@@ -14,7 +14,7 @@ public class ReadActivity extends AppCompatActivity {
 
     private ReadView readView;
     private BookInfo bookInfo = BookReaderApplication.bookInfo;
-    private ArrayList<ChapterInfo> bookChapterList = new ArrayList<>();
+    private ArrayList<ChapterInfo> bookChapterList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
