@@ -26,6 +26,7 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
     private ViewInfo viewInfo;
     private PageView.OnClickListener onClickListener;
     private OnInitNextChapter onInitNextChapter;
+    private boolean isStart;
 
     public PageListAdapter(FragmentManager fm,ViewInfo viewInfo,PageView.OnClickListener onClickListener) {
         super(fm);
@@ -37,7 +38,7 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         int chapterPosition = getChapterPosition(position);
         int pagePosition = getPagePosition(position,chapterPosition);
-        if(Tools.isEmpty(chapterInfoList.get(chapterPosition).getChapterPageList())) {
+        if(isStart && Tools.isEmpty(chapterInfoList.get(chapterPosition).getChapterPageList())) {
             onInitNextChapter.startInit(chapterPosition);
         }
         String pageText = "";
@@ -100,6 +101,11 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
 
     public PageListAdapter setOnInitNextChapter(OnInitNextChapter onInitNextChapter) {
         this.onInitNextChapter = onInitNextChapter;
+        return this;
+    }
+
+    public PageListAdapter setStart(boolean start) {
+        isStart = start;
         return this;
     }
 
