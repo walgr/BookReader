@@ -38,7 +38,7 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         int chapterPosition = getChapterPosition(position);
         int pagePosition = getPagePosition(position,chapterPosition);
-        if(isStart && Tools.isEmpty(chapterInfoList.get(chapterPosition).getChapterPageList())) {
+        if(Tools.isEmpty(chapterInfoList.get(chapterPosition).getChapterPageList())) {
             onInitNextChapter.startInit(chapterPosition);
         }
         String pageText = "";
@@ -71,8 +71,8 @@ public class PageListAdapter extends FragmentStatePagerAdapter {
     }
 
     public int getPageCount(int start,int end) {
+        if(chapterInfoList == null || chapterInfoList.isEmpty()) return 0;
         int count = 0;
-        if(chapterInfoList.isEmpty()) return 0;
         for(int i = start;i < end; ++i) {
             if(!Tools.isEmpty(chapterInfoList.get(i).getChapterPageList()))
                 count+=chapterInfoList.get(i).getChapterPageList().size();

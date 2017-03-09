@@ -31,7 +31,7 @@ public class PageListManager {
         this.onTextFinish = onTextFinish;
         init();
         KLog.a("开始分页");
-        logTime.startTime = System.currentTimeMillis();
+        logTime.start();
         new MyGetAPageAsyncTask().execute(text);
     }
 
@@ -57,7 +57,7 @@ public class PageListManager {
         @Override
         protected void onPostExecute(List<String> result) {
             super.onPostExecute(result);
-            logTime.endTime = System.currentTimeMillis();
+            logTime.end();
             if (!result.isEmpty()) {
                 KLog.a("分页结束" + "用时" + logTime.getUseTime());
                 onTextFinish.onSuccess(result);

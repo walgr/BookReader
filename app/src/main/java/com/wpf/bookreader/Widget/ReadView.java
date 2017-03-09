@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.socks.library.KLog;
 import com.wpf.bookreader.Adapter.PageListAdapter;
 import com.wpf.bookreader.BookReaderApplication;
 import com.wpf.bookreader.DataBase.BookInfo;
@@ -29,6 +30,7 @@ import com.wpf.bookreader.ReadActivity;
 import com.wpf.bookreader.Receiver.BatteryBroadcastReceiver;
 import com.wpf.bookreader.Receiver.TimeBroadcastReceiver;
 import com.wpf.bookreader.Utils.GetStringByUrl;
+import com.wpf.bookreader.Utils.LogTime;
 import com.wpf.bookreader.Utils.PageListManager;
 import com.wpf.bookreader.Utils.Tools;
 import com.wpf.bookreader.View.ViewBase;
@@ -148,13 +150,17 @@ public class ReadView extends LinearLayout implements
         return new SimpleDateFormat("HH:mm").format(new Date());
     }
 
+    private LogTime logTime = new LogTime();
     private void initPage(int chapterPosition) {
         final ChapterInfo chapterInfo = bookChapterList.get(chapterPosition);
         if(initChapterList.contains(chapterInfo)) return;
         initChapterList.add(chapterInfo);
+        KLog.a("开始获取章节内容");
+        logTime.start();
         new GetStringByUrl().getChapterContentByUrl(chapterInfo, new GetStringByUrl.OnTextFinish() {
             @Override
             public void onSuccess(String textInfo) {
+                KLog.a("获取章节内容成功"+"用时："+logTime.getUseTime());
                 chapterInfo.setChapterPageContent(textInfo);
                 ChapterManager.saveChapter(chapterInfo);
                 initPageList(chapterInfo);
@@ -164,10 +170,13 @@ public class ReadView extends LinearLayout implements
 
     private void initPageList(final ChapterInfo chapterInfo) {
 //        pageList.setScrollable(false);
+        KLog.a("开始章节分页");
+        logTime.start();
         new PageListManager().getPageText(getContext(), chapterInfo.getChapterPageContent(),
                 viewInfo, new PageListManager.OnTextFinish() {
                     @Override
                     public void onSuccess(List<String> pageTextList) {
+                        KLog.a("章节分页成功"+"用时："+logTime.getUseTime());
                         chapterInfo.setChapterPageList(pageTextList);
                         pageListAdapter.notifyDataSetChanged();
                         pageList.setCurrentItem(pageListAdapter.getPageCount(0,curChapterPosition) + curPagePosition,false);
@@ -344,6 +353,7 @@ public class ReadView extends LinearLayout implements
 
     @Override
     public void startInit(int chapterPosition) {
+        KLog.a();
         initPage(chapterPosition);
     }
 

@@ -6,9 +6,18 @@ package com.wpf.bookreader.Utils;
  */
 
 public class LogTime {
-    public long startTime,endTime;
+    private long startTime,endTime;
+
+    public void start() {
+        startTime = System.currentTimeMillis();
+    }
+
+    public void end() {
+        endTime = System.currentTimeMillis();
+    }
 
     public String getUseTime() {
+        end();
         return formatTime(endTime - startTime);
     }
 
